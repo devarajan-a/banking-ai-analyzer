@@ -13,6 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class TransactionService {
@@ -119,4 +123,110 @@ public class TransactionService {
                 ))
                 .toList();
     }
+
+    @Transactional
+        public int generateDummyTransactions(User user) {
+
+        Account account = accountRepository.findByUser(user)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        if (transactionRepository.existsByAccountAndDescriptionStartingWith(
+                account, "DUMMY - ")) {
+                throw new RuntimeException(
+                        "Dummy transactions have already been generated"
+                );
+        }
+
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = now.minusMonths(6);
+
+        long seconds = ChronoUnit.SECONDS.between(start, now);
+
+        String[] depositCategories = {
+                "SALARY", "FREELANCE", "REFUND", "CASHBACK", "INTEREST"
+        };
+
+        String[] withdrawalCategories = {
+                "GROCERIES", "FOOD", "TRANSPORT", "UTILITIES",
+                "SHOPPING", "HEALTHCARE", "ENTERTAINMENT",
+                "EDUCATION", "RENT", "CASH"
+        };
+
+        List<Transaction> transactions = new ArrayList<>();
+
+        BigDecimal totalDeposits = BigDecimal.ZERO;
+        BigDecimal totalWithdrawals = BigDecimal.ZERO;
+
+        for (int i = 0; i < 500; i++) {
+
+                boolean deposit = i < 100;
+
+                Transaction transaction = new Transaction();
+
+                transaction.setAccount(account);
+
+                BigDecimal amount;
+
+                if (deposit) {
+                amount = BigDecimal.valueOf(
+                        random.nextInt(5000, 15001)
+                );
+
+                transaction.setTransactionType("DEPOSIT");
+
+                String category = depositCategories[
+                        random.nextInt(depositCategories.length)
+                ];
+
+                transaction.setCategory(category);
+                transaction.setDescription(
+                        "DUMMY - " + category + " income"
+                );
+
+                totalDeposits = totalDeposits.add(amount);
+
+                } else {
+                amount = BigDecimal.valueOf(
+                        random.nextInt(100, 1001)
+                );
+
+                transaction.setTransactionType("WITHDRAWAL");
+
+                String category = withdrawalCategories[
+                        random.nextInt(withdrawalCategories.length)
+                ];
+
+                transaction.setCategory(category);
+                transaction.setDescription(
+                        "DUMMY - " + category + " expense"
+                );
+
+                totalWithdrawals = totalWithdrawals.add(amount);
+                }
+
+                transaction.setAmount(amount);
+
+                transaction.setTransactionDate(
+                        start.plusSeconds(random.nextLong(seconds + 1))
+                );
+
+                transactions.add(transaction);
+        }
+
+        account.setBalance(
+                account.getBalance()
+                        .add(totalDeposits)
+                        .subtract(totalWithdrawals)
+        );
+
+        accountRepository.save(account);
+
+        transactionRepository.saveAll(transactions);
+
+        return transactions.size();
+        }
 }

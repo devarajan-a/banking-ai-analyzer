@@ -30,7 +30,13 @@ public class Transaction {
 
     @PrePersist
     public void onCreate() {
-        transactionDate = LocalDateTime.now();
+        if (transactionDate == null) {
+            transactionDate = LocalDateTime.now();
+        }
+    }
+
+    public void setTransactionDate(LocalDateTime transactionDate) {
+        this.transactionDate = transactionDate;
     }
 
     public Long getId() {

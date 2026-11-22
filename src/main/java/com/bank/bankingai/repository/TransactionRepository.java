@@ -1,3 +1,4 @@
+
 package com.bank.bankingai.repository;
 
 import com.bank.bankingai.entity.Account;
@@ -12,5 +13,10 @@ public interface TransactionRepository
 
     List<Transaction> findByAccountOrderByTransactionDateDesc(
             Account account
+    );
+
+    boolean existsByAccountAndDescriptionStartingWith(
+            Account account,
+            String prefix
     );
 }

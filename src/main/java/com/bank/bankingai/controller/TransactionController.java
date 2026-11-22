@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -62,4 +63,17 @@ public class TransactionController {
                         new RuntimeException("User not found")
                 );
     }
+    @PostMapping("/generate-dummy")
+        public ResponseEntity<Map<String, Object>> generateDummyTransactions(
+                Authentication authentication) {
+
+        User user = getAuthenticatedUser(authentication);
+
+        int count = transactionService.generateDummyTransactions(user);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Dummy transactions generated successfully",
+                "count", count
+        ));
+        }
 }
