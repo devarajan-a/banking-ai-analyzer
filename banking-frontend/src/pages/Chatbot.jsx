@@ -136,7 +136,7 @@ function Chatbot() {
                 <div className="message-label">Banking AI</div>
 
                 <div className="message-content">
-                    Analyzing your transactions... ⏳
+                    Analyzing your banking information... ⏳
                 </div>
                 </div>
             </div>
@@ -146,7 +146,7 @@ function Chatbot() {
         <form className="chat-input-form" onSubmit={handleSend}>
           <input
             type="text"
-            placeholder="Ask about your transactions..."
+            placeholder="Ask me anything about your banking..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             disabled={loading}
