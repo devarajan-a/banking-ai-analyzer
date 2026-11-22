@@ -12,7 +12,7 @@ function Chatbot() {
     {
       role: "assistant",
       content:
-        "Hello! 👋 I'm your Banking AI Assistant. Ask me anything about your transactions.",
+        "Hello! 👋 I'm your personal Banking AI Assistant. I can help you understand your finances, check account balances, analyze income and expenses, track savings, and answer your banking questions. What would you like to know today?",
     },
   ]);
   const [loading, setLoading] = useState(false);
