@@ -52,8 +52,13 @@ public class GroqService {
             String accountData =
                     objectMapper.writeValueAsString(safeAccounts);
 
-            String transactionData =
-                    objectMapper.writeValueAsString(transactions);
+            List<TransactionResponse> recentTransactions =
+                        transactions.stream()
+                                .limit(50)
+                                .toList();
+
+                String transactionData =
+                        objectMapper.writeValueAsString(recentTransactions);
 
             String prompt = """
                     You are a concise Banking AI Assistant.
